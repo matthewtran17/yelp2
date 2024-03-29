@@ -17,52 +17,15 @@
     border-radius: 10pt;
 }
 
-#sidebar {
-    position: relative;
-    margin-left: 10px;
-    border-radius: 10px;
-    border: solid black 2pt;
-    width: 25vw;
-    height: 70vh;
-    box-sizing: border-box;
-    overflow-y: scroll; /* Allow vertical scrolling */
-    background-color: white;
-    text-align: center;
-
+#searchResults {
     display: flex;
+    width: 40vw;
+    height: 20vh;
+    border: solid 0.1pt black;
+    border-radius: 10pt;
+
     flex-direction: column;
-}
 
-#sidebar h2 {
-    margin-right: 15px;
-}
-
-#sidebar::-webkit-scrollbar {
-    width: 0; /* Hide scrollbar */
-    background: transparent; /* Optional: if you want the scrollbar area to be transparent */
-}
-
-#more {
-    margin-top: auto;
-}
-
-#places {
-    text-align: center;
-}
-
-#places li {
-    font-size: 12pt;
-}
-
-.clicked-coordinates {
-    margin-top: 2vh;
-    padding: 1vw;
-    border: 1px solid #8a8a8a;
-    background-color: #f9f9f9;
-    width: 50%;
-
-    margin-left: auto; /* Auto margin on left side */
-    margin-right: auto; /* Auto margin on right side */
 }
 
 .slider-container {
@@ -74,32 +37,6 @@
     display: flex;
 } 
 
-.autoDropdown {
-    /* border-radius: 20pt;
-    width: 12vw;
-    height: 5vh;
-    border: solid black 2pt;
-    background-color: white; */
-    border-radius: 10pt;
-    width: 12vw;
-    height: 6vh;
-    border: solid black 2pt;
-    background-color: white;
-}
-
-.inputAutocomplete {
-    width: 100%;
-    left: 13px;
-}
-
-/* .inputAutocomplete input {
-    flex: 1;
-    margin: 0; 
-}
-
-.inputAutocomplete .MuiInputLabel-root {
-    transform: translate(0, -50%) scale(1); 
-} */
 
 .searchButton {
     width: 100px; 
@@ -128,27 +65,6 @@
     border-radius: 10pt;
 }
 
-ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    overflow-y: scroll;
-    flex-grow: 1;
-}
-
-li {
-    background-color: #f1f1f1;
-    padding: 10px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    font-size: 1.25rem;
-    cursor: pointer;
-}
-
-li:nth-child(odd) {
-    background-color: #fcfcfc;
-}
 
 button {
     width: 100%;
@@ -170,3 +86,20 @@ button:disabled {
     color: #c5d4f0;
     cursor: auto;
 }
+
+
+
+
+
+
+
+/* .clicked-coordinates {
+    margin-top: 2vh;
+    padding: 1vw;
+    border: 1px solid #8a8a8a;
+    background-color: #f9f9f9;
+    width: 50%;
+
+    margin-left: auto; 
+    margin-right: auto; 
+} */

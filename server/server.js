@@ -3,7 +3,7 @@ const axios = require('axios')
 const app = express()
 require('dotenv').config();
 
-async function searchBusiness(pLat, pLng, pTerm, pRadius, pPrice) {
+async function searchBusiness(pLat, pLng, pTerm, pRadius, pPrice, pLimitVal) {
     try {
         const response = await axios.get('https://api.yelp.com/v3/businesses/search', {
             headers: {
@@ -15,9 +15,10 @@ async function searchBusiness(pLat, pLng, pTerm, pRadius, pPrice) {
                 term : pTerm,
                 radius : pRadius, 
                 price : pPrice,
-                limit: 3
-            }
+                limit: pLimitVal,
+            },
         });
+        // console.log(params);
         return response.data;
     } catch (e) {
         console.error('error: ', e);
@@ -25,14 +26,17 @@ async function searchBusiness(pLat, pLng, pTerm, pRadius, pPrice) {
     }
 }
 
-app.get("/api", async (req,res) => {
-    const { lat, lng, term, radius, price } = req.query;
-    // console.log(lat, lng, term, radius, price)
+app.get("/api", async (req, res) => {
+    const { lat, lng, term, radius, price,
+        sort_by,
+        limit
+    } = req.query;
 
-    const businesses = await searchBusiness(lat, lng, term, radius, price);
-    // console.log(businesses)
-    res.json(businesses)
-})
+    console.log("server.js:", lat, lng, term, radius, price, sort_by, limit);
+
+    const businesses = await searchBusiness(lat, lng, term, radius, price, limit);
+    res.json(businesses);
+});
 
 app.listen(5000, () => {console.log("Server started on port 5000")})
 

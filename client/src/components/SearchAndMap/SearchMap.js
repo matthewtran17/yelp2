@@ -5,35 +5,19 @@ import TextField from '@mui/material/TextField';
 import Slider from '@mui/material/Slider';
 import './SearchMap.css';
 
-import axios from 'axios';
-
+// import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormHelperText from '@mui/material/FormHelperText';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 
 const SearchAndMap = () => {
-    const options = [
-        'bar', 
-        'bank', 
-        'gym', 
-        'restaurant', 
-        'shopping_mall', 
-        'liquor_store', 
-        'cafe', 
-        'church',
-        'dentist',
-        'pharmacy',
-        'night_club'
-    ];
-
     const prices = [
         1,
         2,
         3,
         4,
     ]   
-
-    const getOptionLabel = (option) => {
-        // Convert snake_case to Title Case
-        return option.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-    }
 
     const getPriceLabel = (price) => {
         switch (price) {
@@ -46,16 +30,26 @@ const SearchAndMap = () => {
             case 4:
                 return '$$$$';
             default:
-                return '';
+                return '$$';
         }
     };
 
-    const [optionVal, setOptionVal] = useState(options[0]);
+    /* VARIABLES */
+    const [optionVal, setOptionVal] = useState('');
+    const handleOptionChange = (event) => {
+        setOptionVal(event.target.value);
+    };
+
     const [priceVal, setOptionPrice] = useState(prices[0]);
 
+    const [limitVal, setLimit] = useState(10);
+    const handleLimitChange = (event) => {
+        setLimit(event.target.value);
+    };
 
-    const [inputValue, setInputValue] = useState('');
-    const [inputPrice, setInputPrice] = useState('');
+    // const [catergoriesVal, setCategories] = useState('');
+    const [sortByVal, setSortBy] = useState('best_match');
+    // const [hotAndNewToggle, setHotAndNew] = useState(''); 
       
     const [nRadius, setRadius] = useState(9600); // Default radius in meters
     const [clickedLatLng, setClickedLatLng] = useState({ lat: 33.88134, lng: -117.8818 });
@@ -215,17 +209,6 @@ const SearchAndMap = () => {
 
     const [yelpBackendData, setYelpBackendData] = useState([]);
 
-    // useEffect(() => {
-    //     fetch("/api")
-    //     .then(response => response.json())
-    //     .then(data => {
-    //         setYelpBackendData(data);
-    //     })
-    //     .catch(error => {
-    //         console.error('Error fetching data:', error);
-    //     });
-    // }, []);
-
     async function handleSearch() {
         console.log("handle search");
     
@@ -235,8 +218,18 @@ const SearchAndMap = () => {
                 lng: clickedLatLng.lng,
                 term: optionVal,
                 radius: nRadius,
-                price: priceVal
+                
+                price: priceVal,
+                sort_by : sortByVal,
+                limit : limitVal,
+
+                // attributes : 
+                //     "hot_and_new"
+                
+                // sort_by : "best match", "rating", "review_count", "distance" 
             };
+
+            console.log(params)
     
             // Make a GET request with parameters as query string
             const queryString = Object.keys(params)
@@ -256,9 +249,7 @@ const SearchAndMap = () => {
         }
     }
     
-    useEffect(() => {
-        handleSearch();
-    }, []);
+
         
     
 
@@ -267,52 +258,89 @@ const SearchAndMap = () => {
     return (
         <div className='parent-container'>
             <div id="autocomplete-container">
-                <Autocomplete className='autoDropdown'
+                <TextField
+                    hiddenLabel
+                    id="standard-size-normal"
+                    // defaultValue="Normal"
+                    variant="standard"
+                    placeholder='search for ...'
                     value={optionVal}
-                    onChange={(event, newValue) => {
-                        setOptionVal(newValue);
-                    }}
-                    inputValue={inputValue}
-                    onInputChange={(event, newInputValue) => {
-                        setInputValue(newInputValue);
-                    }}
-                    id="clear-on-escape"
-                    options={options}
-                    getOptionLabel={(option) => getOptionLabel(option)}
-                    clearOnEscape
-                    renderInput={(params) => (
-                        <TextField className='inputAutocomplete' 
-                            {...params} 
-                            label="search for ... " 
-                            variant="standard" 
-                            InputProps={{ ...params.InputProps, disableUnderline: true, autoFocus: true }} 
-                        />
-                    )}
+                    onChange={handleOptionChange}
                 />
                 <p> near </p>
                 <input id="searchTextField" type="text" size="50"/>
                 <Button className="searchButton" variant="contained" onClick={handleSearch}>Search</Button>
             </div>
+            
             <div className='search-container'>
-                <Autocomplete className='autoDropdown paramButton'
+                <Select
                     value={priceVal}
-                    onChange={(event, newPrice) => {
-                        setOptionPrice(newPrice);
+                    onChange={(event) => {
+                        setOptionPrice(event.target.value)	
                     }}
-                    inputValue={inputPrice}
-                    onInputChange={(event, newInputPrice)=>{
-                        setInputPrice(newInputPrice)
+                    displayEmpty
+                    inputProps={{ 'aria-label': 'Without label' }}
+                    sx = {{
+                        textAlign: 'center',
+                        width: '155px',
+                        height: '59px',
+                        borderRadius: '40px',
+                        backgroundColor: '#AC3939',
+                        color : '#FFFFFF'
                     }}
-                    id="controllable-states-demo-prices"
-                    options={prices}
-                    getOptionLabel={(option) => getPriceLabel(option)}
-                    renderInput={(params) => <TextField {...params} label="Pricing" />}
-                    sx={{ width: '8vw', height: '5vh' }}
-                    autoComplete={true} // Enable autocomplete
-                    autoHighlight={true} // Highlight first option by default
-                    clearOnEscape={true} // Clear input on pressing escape key
-                />
+                    >
+                    {prices.map((price, index) => (
+                        <MenuItem
+                            key={index}
+                            value={price}
+                        >
+                            {getPriceLabel(price)}
+                        </MenuItem>
+                    ))}
+                </Select>
+                <Select
+                    value={sortByVal}
+                    onChange={(event) => {
+                        setSortBy(event.target.value)	
+                    }}
+                    displayEmpty
+                    inputProps={{ 'aria-label': 'Without label' }}
+                    sx = {{
+                        textAlign: 'center',
+                        width: '155px',
+                        height: '59px',
+                        borderRadius: '40px',
+                        backgroundColor: '#AC3939',
+                        color : '#FFFFFF'
+                    }}
+                    >
+                    <MenuItem value="best_match">Best Match</MenuItem>
+                    <MenuItem value="rating">Rating</MenuItem>
+                    <MenuItem value="review_count">Review Count</MenuItem>
+                    <MenuItem value="distance">Distance</MenuItem>
+                </Select>
+
+                <Select
+                    value={limitVal}
+                    onChange={handleLimitChange}
+                    inputProps={{ 'aria-label': 'Without label' }}
+                    sx = {{
+                        textAlign: 'center',
+                        width: '155px',
+                        height: '59px',
+                        borderRadius: '40px',
+                        backgroundColor: '#AC3939',
+                        color : '#FFFFFF'
+                    }}
+                    >
+                    <MenuItem value={10}>10</MenuItem>
+                    <MenuItem value={20}>20</MenuItem>
+                    <MenuItem value={30}>30</MenuItem>
+                    <MenuItem value={40}>40</MenuItem>
+                    <MenuItem value={50}>50</MenuItem>
+                </Select>
             </div>
+
             <div className='slider-container'>
                 <Slider
                     min={1600}    // minimum radius value in meters
@@ -327,32 +355,23 @@ const SearchAndMap = () => {
             </div>
             <div className='map-side-container'>
                 <div id="map"></div>
-                {/* <div id="sidebar">
-                    <h2>Results</h2>
-                    <ul id="places"></ul>
-                    <button id="more">Load more results</button>
-                    <button id="clear"> Clear Results </button>
-                </div> */}
+                <div id="searchResults">
+                    {yelpBackendData.length === 0 ? ( 
+                        <p>loading...</p>
+                    ) : (
+                        yelpBackendData.businesses.map((business, i) => {
+                        return (
+                            <div key={i}>
+                            <p>Name: {business.name}</p>
+                            <p>Rating: {business.rating}</p>
+                            <img src={business.image_url} alt={business.name} />
+                            {/* Add more properties as needed */}
+                            </div>
+                        );
+                    })
+                    )}
+                </div>
             </div>
-            
-
-            {yelpBackendData.length === 0 ? ( 
-                <p>loading...</p>
-            ) : (
-                yelpBackendData.businesses.map((business, i) => {
-                return (
-                    <div key={i}>
-                    <p>Name: {business.name}</p>
-                    <p>Rating: {business.rating}</p>
-                    <img src={business.image_url} alt={business.name} />
-                    {/* Add more properties as needed */}
-                    </div>
-                );
-                })
-            )}
-
-
-
         </div>
     );
 };

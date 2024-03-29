@@ -7,6 +7,7 @@
     "@craco/craco": "^7.1.0",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.15.14",
     "@mui/material": "^5.15.9",
     "@react-google-maps/api": "^2.19.2",
     "@testing-library/jest-dom": "^5.17.0",
@@ -20,9 +21,9 @@
     "node-fetch": "^3.3.2",
     "path-browserify": "^1.0.1",
     "react": "^18.2.0",
-    "request": "^2.88.2",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
+    "request": "^2.88.2",
     "web-vitals": "^2.1.4",
     "yelp-fusion": "^3.0.0"
   },
