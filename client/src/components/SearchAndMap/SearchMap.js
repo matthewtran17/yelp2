@@ -1,15 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Button from '@mui/material/Button';
-import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import Slider from '@mui/material/Slider';
 import './SearchMap.css';
 
-// import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import FormHelperText from '@mui/material/FormHelperText';
-import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Typography from '@mui/material/Typography';
+import { CardActionArea, CardActions } from '@mui/material';
+
+import Slider2 from 'react-slick';
+
+import Carousel from 'react-bootstrap/Carousel';
 
 const SearchAndMap = () => {
     const prices = [
@@ -47,11 +53,12 @@ const SearchAndMap = () => {
         setLimit(event.target.value);
     };
 
-    // const [catergoriesVal, setCategories] = useState('');
     const [sortByVal, setSortBy] = useState('best_match');
-    // const [hotAndNewToggle, setHotAndNew] = useState(''); 
       
     const [nRadius, setRadius] = useState(9600); // Default radius in meters
+
+    const [yelpBackendData, setYelpBackendData] = useState([]);
+
     const [clickedLatLng, setClickedLatLng] = useState({ lat: 33.88134, lng: -117.8818 });
     const mapRef = useRef(null);
     const circleRef = useRef(null);
@@ -207,8 +214,9 @@ const SearchAndMap = () => {
 
     let markers = [];    
 
-    const [yelpBackendData, setYelpBackendData] = useState([]);
-
+    const [index, setIndex] = useState(0);
+    
+    /* HANDLES SEARCH FROM BACKEND  */
     async function handleSearch() {
         console.log("handle search");
     
@@ -221,12 +229,7 @@ const SearchAndMap = () => {
                 
                 price: priceVal,
                 sort_by : sortByVal,
-                limit : limitVal,
-
-                // attributes : 
-                //     "hot_and_new"
-                
-                // sort_by : "best match", "rating", "review_count", "distance" 
+                limit : limitVal, 
             };
 
             console.log(params)
@@ -263,7 +266,7 @@ const SearchAndMap = () => {
                     id="standard-size-normal"
                     // defaultValue="Normal"
                     variant="standard"
-                    placeholder='search for ...'
+                    placeholder='restaurants'
                     value={optionVal}
                     onChange={handleOptionChange}
                 />
@@ -353,22 +356,30 @@ const SearchAndMap = () => {
                     aria-labelledby="radius-slider"
                 />
             </div>
-            <div className='map-side-container'>
-                <div id="map"></div>
-                <div id="searchResults">
+
+            <div id="map"></div>
+            <div id="searchResults">
+                <div className='grid-container'>
                     {yelpBackendData.length === 0 ? ( 
                         <p>loading...</p>
                     ) : (
-                        yelpBackendData.businesses.map((business, i) => {
-                        return (
-                            <div key={i}>
-                            <p>Name: {business.name}</p>
-                            <p>Rating: {business.rating}</p>
-                            <img src={business.image_url} alt={business.name} />
-                            {/* Add more properties as needed */}
-                            </div>
-                        );
-                    })
+                        <div className="grid">
+                            {yelpBackendData.businesses.map((business, i) => {
+                                return (   
+                                    <div key={i} className='card'>
+                                        <CardActionArea>
+                                            <CardMedia style={{ width: '50%', height: '40%' }}>
+                                                <img className='businessImg' src={business.image_url} alt={business.name} style={{ width: '100%', height: '100%' }} />
+                                            </CardMedia>
+                                        </CardActionArea>
+                                        <CardContent>
+                                            <p>Name: {business.name}</p>
+                                            <p>Rating: {business.rating}</p>
+                                        </CardContent>
+                                    </div>
+                                );
+                            })}
+                        </div>
                     )}
                 </div>
             </div>
@@ -378,6 +389,17 @@ const SearchAndMap = () => {
 
 export default SearchAndMap;
 
+// <Card key={i} style={{ width: 383, height: 553 }}>
+//     <CardActionArea>
+//         <CardMedia style={{ width: '100%', height: '383px' }}>
+//             <img className='businessImg' src={business.image_url} alt={business.name} style={{ width: '100%', height: '100%' }} />
+//         </CardMedia>
+//     </CardActionArea>
+//     <CardContent>
+//         <p>Name: {business.name}</p>
+//         <p>Rating: {business.rating}</p>
+//     </CardContent>
+// </Card>
 
 
 
@@ -517,26 +539,26 @@ function deleteMarkers() {
 
 /*
 
-        // function initializeAutocomplete() {
-        //     var input = document.getElementById('searchTextField');
-        //     var autocomplete = new window.google.maps.places.Autocomplete(input);
+// function initializeAutocomplete() {
+//     var input = document.getElementById('searchTextField');
+//     var autocomplete = new window.google.maps.places.Autocomplete(input);
 
-        //     // Listen for the 'place_changed' event
-        //     autocomplete.addListener('place_changed', function() {
-        //         infoWindow.close()
-        //         var place = autocomplete.getPlace();
-        //         console.log("Autocomplete result: ", place); // Log the details of the selected place
-            
-        //         // Log place.geometry.location for debugging
-        //         console.log("Geometry location: ", place.geometry.location);
-            
-        //         if (place.geometry && place.geometry.location instanceof window.google.maps.LatLng) {
-        //             const autoLatLng = {
-        //                 lat: place.geometry.location.lat(),
-        //                 lng: place.geometry.location.lng()
-        //             };
-        //             console.log("autoComplete lat/lng: ", autoLatLng);
-        //             map.panTo(place.geometry.location);
+//     // Listen for the 'place_changed' event
+//     autocomplete.addListener('place_changed', function() {
+//         infoWindow.close()
+//         var place = autocomplete.getPlace();
+//         console.log("Autocomplete result: ", place); // Log the details of the selected place
+    
+//         // Log place.geometry.location for debugging
+//         console.log("Geometry location: ", place.geometry.location);
+    
+//         if (place.geometry && place.geometry.location instanceof window.google.maps.LatLng) {
+//             const autoLatLng = {
+//                 lat: place.geometry.location.lat(),
+//                 lng: place.geometry.location.lng()
+//             };
+//             console.log("autoComplete lat/lng: ", autoLatLng);
+//             map.panTo(place.geometry.location);
 
 
 
