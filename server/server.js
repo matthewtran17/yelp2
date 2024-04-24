@@ -3,28 +3,39 @@ const axios = require('axios')
 const app = express()
 require('dotenv').config();
 
-async function searchBusiness(pLat, pLng, pTerm, pRadius, pPrice, pLimitVal) {
+async function searchBusiness(pLat, pLng, pTerm, pRadius, pPrice, pLimitVal, pAttribute, pOpen) {
     try {
+        const params = {
+            latitude: pLat, 
+            longitude: pLng, 
+            term: pTerm,
+            radius: pRadius,
+            price: pPrice,
+            limit: pLimitVal,
+        };
+
+        if (pAttribute) {
+            params.attributes = pAttribute;
+        }
+        if (pOpen) {
+            params.open_now = pOpen;
+        }
+
+        console.log(params)
+
         const response = await axios.get('https://api.yelp.com/v3/businesses/search', {
             headers: {
                 Authorization: `Bearer ${process.env.REACT_APP_YELP_APP_KEY}`
             },
-            params: {
-                latitude : pLat, // Pass latitude
-                longitude :  pLng, // Pass longitude
-                term : pTerm,
-                radius : pRadius, 
-                price : pPrice,
-                limit: pLimitVal,
-            },
+            params: params,
         });
-        // console.log(params);
         return response.data;
     } catch (e) {
         console.error('error: ', e);
-        throw e; // Rethrow error to handle it in the calling function
+        throw e; 
     }
 }
+
 
 app.get("/api", async (req, res) => {
     const { lat, lng, term, radius, price,

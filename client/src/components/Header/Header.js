@@ -3,7 +3,12 @@ import './Header.css'
 
 const Header = () => {
     return (
-        <div className='Title'> GOOGLE MAPS API PROJECT </div>
+        <>
+            <div className='Title'>YELP 2</div>
+            <div>
+                <hr></hr>     
+            </div>
+        </>
     )
 }
 

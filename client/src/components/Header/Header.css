@@ -1,9 +1,9 @@
 .Title {
-    padding-top: 10px;
-    padding-bottom: 10px;
+    margin-top: 1vw;
+    margin-bottom: 1vw;
+
     font-size: 48pt;
-    background-color: black;
-    color: white;
+    color: #AC3939;
     width: 100%;
     text-align: center;
 }

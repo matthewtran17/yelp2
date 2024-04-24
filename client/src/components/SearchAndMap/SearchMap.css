@@ -1,47 +1,65 @@
+@font-face {
+    font-family: 'Helvetica';
+    src: url('../../fonts/HELVETICANEUEROMAN.OTF') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+* {
+    font-family: Helvetica;
+}
+
 .parent-container {
     display: flex;
     flex-direction: column;
     padding-bottom: 40px;
 }
 
-/* .map-side-container  {
+.map-and-search {
     display: flex;
-} */
+    flex-direction: row; /* Display items side by side */
+    justify-content: flex-start; /* Align items to the start of the container */
+}
 
 #map {
-    /* flex: 4; */
-    margin: auto;
-    width: 50vw;  
-    height: 70vh;
+    flex: 0 0 auto;
+    width: 50vw;
+    height: 60vh;
     border: solid 0.1pt rgb(196, 196, 196);
     border-radius: 10pt;
 }
 
-#searchResults {
-    display: flex;
-    height: 20vh;
+.searchResults {
+    flex: 1 1 50%;
+    height: 70vh;
+    width: 50vw;
     border: solid 0.1pt black;
     border-radius: 10pt;
+    overflow-y: auto;
+    display: flex;
     flex-direction: column;
 }
 
-#card {
-    display: flex;
-    flex-direction: column;
-}
+
 
 .slider-container {
     width: 80%;
-    margin: auto;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 2vw;
+    margin-bottom: 0.5vw;
 }
 
 .search-container {
     display: flex;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 2vh;
 } 
 
 .searchButton {
-    width: 100px; 
-    height: 40px;
+    width: 8vw; 
+    height: 6vh;    
 }
 
 #autocomplete-container {
@@ -56,48 +74,49 @@
     height: 4vh;
 
     padding: 10px;
-    border: solid black 2pt;
     border-radius: 10pt;
 }
 
 
-button {
-    width: 100%;
-    padding: 1rem;
-    flex-grow: 0;
-    cursor: pointer;
-    background: #1a73e8;
-    font-size: 1.5rem;
-    color: white;
-    border: none;
-}
+
 
 button:hover {
-    color: #c5d4f0;
+    color: #AC3939;
+    background-color: #ffffff;
+    border: 1px solid rgb(133, 92, 92)39;
 }
 
 button:disabled {
     background-color: #9fc1ee;
-    color: #c5d4f0;
+    color: #AC3939;
     cursor: auto;
+    border: 1px solid rgb(133, 92, 92)39;
+}
+
+.card {
+    border: 1px solid rgb(194, 194, 194);
+    background-color: #AC3939;
+    color: white;
+    overflow: hidden;
+    border-radius: 2vw;
+    text-align: center; /* Center the content horizontally */
+    height:20vh;
+}
+
+.businessImg {
+    display: block; /* Ensures the image behaves as a block element */
+    object-fit: cover;
+    width: 12vw;
+    height: 10vh;
 }
 
 .grid {
     display: grid;
-    grid-gap: 20px;
-    grid-template-columns: 250px 250px 250px;
+    grid-gap: 1vw;
+    grid-template-columns: 12vw 12vw 12vw;
+    margin-left: 1vw;
 }
 
-.card {
-    border: 1px solid black;
-    border-radius: 5vw;
-    overflow: hidden;
-}
-
-.businessImg {
-    width: 100%;
-    height: 100%;
-}
 
 
 

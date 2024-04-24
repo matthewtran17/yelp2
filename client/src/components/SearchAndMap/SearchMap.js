@@ -6,16 +6,18 @@ import './SearchMap.css';
 
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import ToggleButton from '@mui/material/ToggleButton';
 
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import { CardActionArea, CardActions } from '@mui/material';
+import Pagination from '@mui/material/Pagination';
 
-import Slider2 from 'react-slick';
 
-import Carousel from 'react-bootstrap/Carousel';
+
 
 const SearchAndMap = () => {
     const prices = [
@@ -24,6 +26,13 @@ const SearchAndMap = () => {
         3,
         4,
     ]   
+
+
+    const [formats, setFormats] = React.useState(() => ['hot_and_new', 'open_now']);
+
+    const handleFormat = (event, newFormats) => {
+      setFormats(newFormats);
+    };
 
     const getPriceLabel = (price) => {
         switch (price) {
@@ -48,14 +57,18 @@ const SearchAndMap = () => {
 
     const [priceVal, setOptionPrice] = useState(prices[0]);
 
-    const [limitVal, setLimit] = useState(10);
+    const [limitVal, setLimit] = useState(9);
     const handleLimitChange = (event) => {
         setLimit(event.target.value);
     };
 
     const [sortByVal, setSortBy] = useState('best_match');
       
-    const [nRadius, setRadius] = useState(9600); // Default radius in meters
+    const [nRadius, setRadius] = useState(9600); 
+    const handleRadiusChange = (event, value) => {
+        setRadius(value); 
+        circleRef.current.setRadius(value); 
+    };
 
     const [yelpBackendData, setYelpBackendData] = useState([]);
 
@@ -63,11 +76,11 @@ const SearchAndMap = () => {
     const mapRef = useRef(null);
     const circleRef = useRef(null);
 
+
     useEffect(() => {
         const loadGoogleMapsScript = () => {
             const script = document.createElement('script');
 
-            // script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCUnmqTkhklqvM0P2AjfHMVyx7bxBmMwio&libraries=places&callback=initMap`;
             script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}&libraries=places&callback=initMap`;
 
             script.async = true;
@@ -81,123 +94,103 @@ const SearchAndMap = () => {
         };
 
         const initMap = () => {
-            if (window.google && window.google.maps && window.google.maps.Map) {
-                const fullerton = { lat: 33.8831307524001, lng: -117.88541077620087 };
-                const map = new window.google.maps.Map(document.getElementById('map'), {
-                    zoom: 11,
-                    center: fullerton,
-                });
-
-                mapRef.current = map;
-
-                const initCircle = new window.google.maps.Circle({
-                    strokeColor: "#083D77",
-                    strokeOpacity: 0.8,
-                    strokeWeight: 2,
-                    fillColor: "#083D77",
-                    fillOpacity: 0.15,
-                    map,
-                    center: fullerton,
-                    radius: nRadius, 
-                });
-
-                circleRef.current = initCircle;
-
-                let infoWindow = new window.google.maps.InfoWindow({
-                    content: "Fullerton",
-                    position: fullerton,
-                });
-
-                infoWindow.open(map);
-
-                setClickedLatLng(fullerton);
-
-                function initializeAutocomplete() {
-                    var input = document.getElementById('searchTextField');
-                    var autocomplete = new window.google.maps.places.Autocomplete(input);
-        
-                    // Listen for the 'place_changed' event
-                    autocomplete.addListener('place_changed', function() {
-                        infoWindow.close()
-                        var place = autocomplete.getPlace();
-                        console.log("Autocomplete result: ", place); // Log the details of the selected place
-                    
-                        // Log place.geometry.location for debugging
-                        console.log("Geometry location: ", place.geometry.location);
-                    
-                        if (place.geometry && place.geometry.location instanceof window.google.maps.LatLng) {
-                            const autoLatLng = {
-                                lat: place.geometry.location.lat(),
-                                lng: place.geometry.location.lng()
-                            };
-                            console.log("autoComplete lat/lng: ", autoLatLng);
-                            map.panTo(place.geometry.location);
-
-                            // Set the clicked LatLng
-                            setClickedLatLng(autoLatLng);
-
-                            // Set the content of the info window
-                            const currLatLng = JSON.stringify(autoLatLng, null, 2);
-
-                            infoWindow = new window.google.maps.InfoWindow({
-                                position: currLatLng,
-                                center: currLatLng,
-                            });
-
-                            infoWindow.setContent(currLatLng);
-                            
-                            initCircle.setCenter(autoLatLng);
-
-                            infoWindow.open(map);
-                        } else {
-                            console.log("No geometry or location found for the selected place, or location is not an instance of google.maps.LatLng.");
-                        }
-                    });
-        
-                    // Add event listener for 'keypress' event to trigger search on 'Enter' key press
-                    input.addEventListener('keypress', function(event) {
-                        if (event.key === 'Enter') {
-                            // Trigger search only if the input field is not empty
-                            if (input.value.trim() !== '') {
-                                // Simulate a click on the first prediction in the Autocomplete dropdown
-                                var firstPrediction = document.querySelector('.pac-container .pac-item');
-                                if (firstPrediction) {
-                                    firstPrediction.click();
-                                }
-                            }
-                        }
-                    });
-                }
-
-                initializeAutocomplete();
-
-                map.addListener('click', (clickEvent) => {
-                    infoWindow.close();
-
-                    const lat = clickEvent.latLng.lat();
-                    const lng = clickEvent.latLng.lng();
-                    const clickedLatLng = { lat, lng };
-
-                    infoWindow = new window.google.maps.InfoWindow({
-                        position: clickedLatLng,
-                        center: clickedLatLng,
-                    });
-
-                    console.log(clickEvent)
-                    map.panTo(clickEvent.latLng);
-                    setClickedLatLng(clickedLatLng);
-
-                    const currLatLng = JSON.stringify(clickEvent.latLng.toJSON(), null, 2);
-                    infoWindow.setContent(currLatLng);
-
-                    initCircle.setCenter(clickEvent.latLng);
-
-                    infoWindow.open(map);
-                });
-            } else {
+            if (!window.google || !window.google.maps || !window.google.maps.Map) {
                 console.error('Error: google.maps.Map not defined');
+                return;
+            }
+        
+            const fullerton = { lat: 33.8831307524001, lng: -117.88541077620087 };
+            const map = createMap(fullerton);
+        
+            if (!map) {
+                console.error('Error: Unable to create map');
+                return;
+            }
+        
+            const initCircle = createCircle(map, fullerton);
+            const autocomplete = initializeAutocomplete(map, initCircle);
+            circleRef.current = initCircle;
+            mapRef.current = map;
+        
+            map.addListener('click', (clickEvent) => {
+                handleMapClick(clickEvent, map, initCircle);
+            });
+        };
+        
+        const createMap = (center) => {
+            return new window.google.maps.Map(document.getElementById('map'), {
+                zoom: 11,
+                center: center,
+            });
+        };
+        
+        const createCircle = (map, center) => {
+            return new window.google.maps.Circle({
+                strokeColor: "#083D77",
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: "#083D77",
+                fillOpacity: 0.15,
+                map: map,
+                center: center,
+                radius: nRadius,
+            });
+        };
+        
+        const initializeAutocomplete = (map, circleRef) => {
+            const input = document.getElementById('searchTextField');
+            const autocomplete = new window.google.maps.places.Autocomplete(input);
+        
+            autocomplete.addListener('place_changed', () => {
+                handlePlaceChanged(autocomplete, map, circleRef);
+            });
+        
+            input.addEventListener('keypress', (event) => {
+                handleKeyPress(event, input, autocomplete);
+            });
+        
+            return autocomplete;
+        };
+        
+        const handleMapClick = (clickEvent, map, circle) => {
+            const lat = clickEvent.latLng.lat();
+            const lng = clickEvent.latLng.lng();
+            const clickedLatLng = { lat, lng };
+        
+            map.panTo(clickEvent.latLng);
+            setClickedLatLng(clickedLatLng);
+            circle.setCenter(clickEvent.latLng);
+        };
+        
+        const handlePlaceChanged = (autocomplete, map, circle) => {
+            const place = autocomplete.getPlace();
+        
+            if (place.geometry && place.geometry.location instanceof window.google.maps.LatLng) {
+                const autoLatLng = {
+                    lat: place.geometry.location.lat(),
+                    lng: place.geometry.location.lng()
+                };
+        
+                map.panTo(place.geometry.location);
+                setClickedLatLng(autoLatLng);
+                circle.setCenter(place.geometry.location); // Update the center of the existing circle
+            } else {
+                console.log("No geometry or location found for the selected place, or location is not an instance of google.maps.LatLng.");
             }
         };
+        
+        
+        const handleKeyPress = (event, input, autocomplete) => {
+            if (event.key === 'Enter') {
+                if (input.value.trim() !== '') {
+                    var firstPrediction = document.querySelector('.pac-container .pac-item');
+                    if (firstPrediction) {
+                        firstPrediction.click();
+                    }
+                }
+            }
+        };
+        
 
         if (!window.google || !window.google.maps || !window.google.maps.Map) {
             loadGoogleMapsScript();
@@ -205,20 +198,28 @@ const SearchAndMap = () => {
             initMap();
         }
 
-    }, []); 
+    }, []);
 
-    const handleRadiusChange = (event, value) => {
-        setRadius(value); 
-        circleRef.current.setRadius(value); 
-    };
 
-    let markers = [];    
+    let markers = []
 
-    const [index, setIndex] = useState(0);
+    // Adds a marker to the map and push to the array.
+    function addMarker(position) {
+        const marker = new window.google.maps.Marker({
+        position,
+        map: mapRef.current,
+        });
     
-    /* HANDLES SEARCH FROM BACKEND  */
-    async function handleSearch() {
+        markers.push(marker);
+    }
+    
+
+    const handleSearch = async () => {
         console.log("handle search");
+        console.log("clearing markers");
+        console.log("markers (1):", markers);
+    
+        console.log("markers (2):", markers);
     
         try {
             const params = {
@@ -226,18 +227,25 @@ const SearchAndMap = () => {
                 lng: clickedLatLng.lng,
                 term: optionVal,
                 radius: nRadius,
-                
                 price: priceVal,
-                sort_by : sortByVal,
-                limit : limitVal, 
+                sort_by: sortByVal,
+                limit: limitVal,
             };
 
-            console.log(params)
+            if (formats.includes("hot_and_new")) {
+                params.attributes = "hot_and_new";
+            }
+            if (formats.includes("open_now")) {
+                params.open_now = true;
+            }
+    
+            console.log("params: ", params);
     
             // Make a GET request with parameters as query string
             const queryString = Object.keys(params)
                 .map(key => `${key}=${encodeURIComponent(params[key])}`)
                 .join('&');
+                console.log(queryString)
             const response = await fetch(`/api?${queryString}`);
     
             if (!response.ok) {
@@ -245,12 +253,24 @@ const SearchAndMap = () => {
             }
     
             const data = await response.json();
-            console.log(data)
+    
+            // Add new markers
+            data.businesses.forEach(business => {
+                const position = {
+                    lat: business.coordinates.latitude,
+                    lng: business.coordinates.longitude
+                };
+                addMarker(position);
+            });
+            console.log(data);
             setYelpBackendData(data);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
-    }
+    };
+    
+    
+
     
 
         
@@ -264,7 +284,6 @@ const SearchAndMap = () => {
                 <TextField
                     hiddenLabel
                     id="standard-size-normal"
-                    // defaultValue="Normal"
                     variant="standard"
                     placeholder='restaurants'
                     value={optionVal}
@@ -277,6 +296,7 @@ const SearchAndMap = () => {
             
             <div className='search-container'>
                 <Select
+                    className='paramButton'
                     value={priceVal}
                     onChange={(event) => {
                         setOptionPrice(event.target.value)	
@@ -285,11 +305,12 @@ const SearchAndMap = () => {
                     inputProps={{ 'aria-label': 'Without label' }}
                     sx = {{
                         textAlign: 'center',
-                        width: '155px',
-                        height: '59px',
-                        borderRadius: '40px',
+                        width: '6.5vw',
+                        height: '5vh',
+                        borderRadius: '2vw',
                         backgroundColor: '#AC3939',
-                        color : '#FFFFFF'
+                        color : '#FFFFFF',
+                        marginRight: '0.5vw'
                     }}
                     >
                     {prices.map((price, index) => (
@@ -301,6 +322,7 @@ const SearchAndMap = () => {
                         </MenuItem>
                     ))}
                 </Select>
+
                 <Select
                     value={sortByVal}
                     onChange={(event) => {
@@ -310,11 +332,12 @@ const SearchAndMap = () => {
                     inputProps={{ 'aria-label': 'Without label' }}
                     sx = {{
                         textAlign: 'center',
-                        width: '155px',
-                        height: '59px',
-                        borderRadius: '40px',
+                        width: '6.5vw',
+                        height: '5vh',
+                        borderRadius: '2vw',
                         backgroundColor: '#AC3939',
-                        color : '#FFFFFF'
+                        color : '#FFFFFF',
+                        marginRight: '0.5vw'
                     }}
                     >
                     <MenuItem value="best_match">Best Match</MenuItem>
@@ -329,19 +352,48 @@ const SearchAndMap = () => {
                     inputProps={{ 'aria-label': 'Without label' }}
                     sx = {{
                         textAlign: 'center',
-                        width: '155px',
-                        height: '59px',
-                        borderRadius: '40px',
+                        width: '6.5vw',
+                        height: '5vh',
+                        borderRadius: '2vw',
                         backgroundColor: '#AC3939',
-                        color : '#FFFFFF'
+                        color : '#FFFFFF',
+                        marginRight: '0.5vw'
                     }}
                     >
-                    <MenuItem value={10}>10</MenuItem>
-                    <MenuItem value={20}>20</MenuItem>
-                    <MenuItem value={30}>30</MenuItem>
-                    <MenuItem value={40}>40</MenuItem>
-                    <MenuItem value={50}>50</MenuItem>
+                    <MenuItem value={9}>9</MenuItem>
+                    <MenuItem value={18}>18</MenuItem>
+                    <MenuItem value={27}>27</MenuItem>
                 </Select>
+
+                <ToggleButtonGroup
+                    color="primary"
+                    value={formats}
+                    onChange={handleFormat}
+                    aria-label="Platform"
+                >
+                    <ToggleButton value="hot_and_new"
+                        sx = {{
+                            textAlign: 'center',
+                            width: '6.5vw',
+                            height: '5vh',
+                            borderRadius: '2vw',
+                            backgroundColor: '#AC3939',
+                            color : '#FFFFFF',
+                        }}
+                    >Hot and New</ToggleButton>
+                    <ToggleButton value="open_now"
+                        sx = {{
+                            textAlign: 'center',
+                            width: '6.5vw',
+                            height: '5vh',
+                            borderRadius: '2vw',
+                            backgroundColor: '#AC3939',
+                            color : '#FFFFFF',
+                        }}    
+                    >Open Now</ToggleButton>
+                </ToggleButtonGroup>
+            
+            
             </div>
 
             <div className='slider-container'>
@@ -357,31 +409,34 @@ const SearchAndMap = () => {
                 />
             </div>
 
-            <div id="map"></div>
-            <div id="searchResults">
-                <div className='grid-container'>
-                    {yelpBackendData.length === 0 ? ( 
-                        <p>loading...</p>
-                    ) : (
-                        <div className="grid">
-                            {yelpBackendData.businesses.map((business, i) => {
-                                return (   
-                                    <div key={i} className='card'>
-                                        <CardActionArea>
-                                            <CardMedia style={{ width: '50%', height: '40%' }}>
-                                                <img className='businessImg' src={business.image_url} alt={business.name} style={{ width: '100%', height: '100%' }} />
-                                            </CardMedia>
-                                        </CardActionArea>
-                                        <CardContent>
-                                            <p>Name: {business.name}</p>
-                                            <p>Rating: {business.rating}</p>
-                                        </CardContent>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
+            <div className='map-and-search'>
+                <div id="map"></div>
+                <div id="searchResults">
+                    <div>
+                        {yelpBackendData.length === 0 ? (
+                            <p></p>
+                        ) : (
+                            <div className="grid">
+                                {yelpBackendData.businesses.map((business, i) => {
+                                    return (
+                                        <div key={i} className='card'>
+                                            <CardActionArea>
+                                                <CardMedia>
+                                                    <img className='businessImg' src={business.image_url} alt={business.name} />
+                                                </CardMedia>
+                                            </CardActionArea>
+                                            {/* <CardContent> */}
+                                                <p>{business.name}</p>
+                                                <p>{business.rating}</p>
+                                            {/* </CardContent> */}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
                 </div>
+
             </div>
         </div>
     );
