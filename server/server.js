@@ -3,15 +3,15 @@ const axios = require('axios')
 const app = express()
 require('dotenv').config();
 
-async function searchBusiness(pLat, pLng, pTerm, pRadius, pPrice, pLimitVal, pAttribute, pOpen) {
+async function searchBusiness(pLat, pLng, pRadius, pPrice, pSortBy, pLimit, pAttribute, pOpen) {
     try {
         const params = {
             latitude: pLat, 
             longitude: pLng, 
-            term: pTerm,
             radius: pRadius,
             price: pPrice,
-            limit: pLimitVal,
+            sort_by : pSortBy,
+            limit: pLimit,
         };
 
         if (pAttribute) {
@@ -38,14 +38,18 @@ async function searchBusiness(pLat, pLng, pTerm, pRadius, pPrice, pLimitVal, pAt
 
 
 app.get("/api", async (req, res) => {
-    const { lat, lng, term, radius, price,
+    const { 
+        lat, 
+        lng,  
+        radius, 
+        price,
         sort_by,
         limit
     } = req.query;
 
-    console.log("server.js:", lat, lng, term, radius, price, sort_by, limit);
+    console.log("server.js:", lat, lng, radius, price, sort_by, limit);
 
-    const businesses = await searchBusiness(lat, lng, term, radius, price, limit);
+    const businesses = await searchBusiness(lat, lng, radius, price, sort_by, limit);
     res.json(businesses);
 });
 

@@ -126,10 +126,10 @@ const SearchAndMap = () => {
         
         const createCircle = (map, center) => {
             return new window.google.maps.Circle({
-                strokeColor: "#083D77",
+                strokeColor: "#AC3939",
                 strokeOpacity: 0.8,
                 strokeWeight: 2,
-                fillColor: "#083D77",
+                fillColor: "#AC3939",
                 fillOpacity: 0.15,
                 map: map,
                 center: center,
@@ -139,6 +139,12 @@ const SearchAndMap = () => {
         
         const initializeAutocomplete = (map, circleRef) => {
             const input = document.getElementById('searchTextField');
+
+            input.style.border = '1px'
+            input.style.borderColor = '#AC3939'
+            input.style.textAlign = 'center'
+
+
             const autocomplete = new window.google.maps.places.Autocomplete(input);
         
             autocomplete.addListener('place_changed', () => {
@@ -203,13 +209,24 @@ const SearchAndMap = () => {
 
     let markers = []
 
-    // Adds a marker to the map and push to the array.
-    function addMarker(position) {
+    function addMarker(position, content) {
         const marker = new window.google.maps.Marker({
-        position,
-        map: mapRef.current,
+            position,
+            map: mapRef.current, // This should refer to your Google Map instance
         });
     
+        const infoWindow = new window.google.maps.InfoWindow({
+            content: content // Content can be a string or HTML
+        });
+    
+        marker.addListener('click', () => {
+            infoWindow.open({
+                anchor: marker,
+                map: mapRef.current,
+                shouldFocus: false,
+            });
+        });
+
         markers.push(marker);
     }
     
@@ -218,26 +235,25 @@ const SearchAndMap = () => {
         console.log("handle search");
         console.log("clearing markers");
         console.log("markers (1):", markers);
-    
+        // mapRef.current.clearOverlays();
         console.log("markers (2):", markers);
     
         try {
             const params = {
                 lat: clickedLatLng.lat,
                 lng: clickedLatLng.lng,
-                term: optionVal,
                 radius: nRadius,
                 price: priceVal,
                 sort_by: sortByVal,
                 limit: limitVal,
             };
 
-            if (formats.includes("hot_and_new")) {
-                params.attributes = "hot_and_new";
-            }
-            if (formats.includes("open_now")) {
-                params.open_now = true;
-            }
+            // if (formats.includes("hot_and_new")) {
+            //     params.attributes = "hot_and_new";
+            // }
+            // if (formats.includes("open_now")) {
+            //     params.open_now = true;
+            // }
     
             console.log("params: ", params);
     
@@ -260,7 +276,9 @@ const SearchAndMap = () => {
                     lat: business.coordinates.latitude,
                     lng: business.coordinates.longitude
                 };
-                addMarker(position);
+
+                const placeName = business.name;
+                addMarker(position, placeName);
             });
             console.log(data);
             setYelpBackendData(data);
@@ -287,11 +305,27 @@ const SearchAndMap = () => {
                     variant="standard"
                     placeholder='restaurants'
                     value={optionVal}
+                    sx={{
+                        marginTop : '1vh',
+                    }}
                     onChange={handleOptionChange}
                 />
                 <p> near </p>
                 <input id="searchTextField" type="text" size="50"/>
-                <Button className="searchButton" variant="contained" onClick={handleSearch}>Search</Button>
+                <Button 
+                    className="searchButton" 
+                    variant="contained"
+                    sx={{
+                        backgroundColor: '#AC3939',
+                        textAlign: 'center',
+                        '&:hover': {
+                            backgroundColor: 'gray', 
+                            color: 'white'
+                        }
+                        
+                    }} 
+                    onClick={handleSearch}>Search
+                </Button>
             </div>
             
             <div className='search-container'>
@@ -337,7 +371,8 @@ const SearchAndMap = () => {
                         borderRadius: '2vw',
                         backgroundColor: '#AC3939',
                         color : '#FFFFFF',
-                        marginRight: '0.5vw'
+                        marginRight: '0.5vw',
+                        fontSize: '0.65vw'
                     }}
                     >
                     <MenuItem value="best_match">Best Match</MenuItem>
@@ -379,6 +414,7 @@ const SearchAndMap = () => {
                             borderRadius: '2vw',
                             backgroundColor: '#AC3939',
                             color : '#FFFFFF',
+                            fontSize: '0.75vw'
                         }}
                     >Hot and New</ToggleButton>
                     <ToggleButton value="open_now"
@@ -389,6 +425,7 @@ const SearchAndMap = () => {
                             borderRadius: '2vw',
                             backgroundColor: '#AC3939',
                             color : '#FFFFFF',
+                            fontSize: '0.75vw'
                         }}    
                     >Open Now</ToggleButton>
                 </ToggleButtonGroup>
@@ -402,6 +439,9 @@ const SearchAndMap = () => {
                     max={40000}   // maximum radius value in meters
                     step={1600}   // step size for the slider
                     onChange={handleRadiusChange}
+                    sx={{
+                        color: '#AC3939'
+                    }}
                     value={nRadius} // Slider value in meters
                     valueLabelDisplay="on"
                     valueLabelFormat={(value) => `${value / 1600} ${value === 1600 ? 'mile' : 'miles'}`}
@@ -420,15 +460,11 @@ const SearchAndMap = () => {
                                 {yelpBackendData.businesses.map((business, i) => {
                                     return (
                                         <div key={i} className='card'>
-                                            <CardActionArea>
                                                 <CardMedia>
                                                     <img className='businessImg' src={business.image_url} alt={business.name} />
                                                 </CardMedia>
-                                            </CardActionArea>
-                                            {/* <CardContent> */}
-                                                <p>{business.name}</p>
-                                                <p>{business.rating}</p>
-                                            {/* </CardContent> */}
+                                            <a href={business.url} target="_blank" rel="noopener noreferrer">{business.name}</a>
+                                            <p>Rating: {business.rating}</p>
                                         </div>
                                     );
                                 })}

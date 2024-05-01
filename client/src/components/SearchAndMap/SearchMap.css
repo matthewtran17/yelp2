@@ -9,6 +9,13 @@
     font-family: Helvetica;
 }
 
+.card a {
+    position: relative;
+    color: white;
+    top: 0.5vw;
+    /* padding-top: 1vw; */
+}
+
 .parent-container {
     display: flex;
     flex-direction: column;
@@ -19,14 +26,17 @@
     display: flex;
     flex-direction: row; /* Display items side by side */
     justify-content: flex-start; /* Align items to the start of the container */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    padding: 1vw;
+    background: rgb(224, 224, 224);
 }
 
 #map {
     flex: 0 0 auto;
     width: 50vw;
     height: 60vh;
-    border: solid 0.1pt rgb(196, 196, 196);
     border-radius: 10pt;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .searchResults {
@@ -67,6 +77,10 @@
     margin: auto;
     margin-top: 20px;
     gap: 20px;
+    padding: 1vw;
+    border: 1px solid rgb(193, 193, 193);
+    background-color: white;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 #searchTextField {
@@ -75,6 +89,11 @@
 
     padding: 10px;
     border-radius: 10pt;
+
+    z-index: 1000; /* Example to ensure it's on top if needed */
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto; /* Ensure pointer events are not disabled */
 }
 
 
@@ -87,7 +106,7 @@ button:hover {
 }
 
 button:disabled {
-    background-color: #9fc1ee;
+    background-color: #8d8d8d;
     color: #AC3939;
     cursor: auto;
     border: 1px solid rgb(133, 92, 92)39;
@@ -100,7 +119,8 @@ button:disabled {
     overflow: hidden;
     border-radius: 2vw;
     text-align: center; /* Center the content horizontally */
-    height:20vh;
+    height:18vh;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .businessImg {
