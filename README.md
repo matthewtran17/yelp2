@@ -8,3 +8,6 @@ In this project, we utilize the Google Maps API to create an interactive click a
 4. Create 2 terminals and run `npm start` in /server.
 5. Run `npm start` in /client.
 6. Done!
+
+https://github.com/ryan-avancena/yelp2/assets/134652349/fcdf7915-4943-4c34-be8f-f4e5e3b73b92
+
